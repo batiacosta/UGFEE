@@ -2,11 +2,11 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FreeTrialUI : UIScreenBase
+public class StartFreeTrial : UIScreenBase
 {
 
+    [SerializeField] private GameObject _nextUI;
     private ToggleGroup _toggleGroup;
-
     private void Start()
     {
         throw new NotImplementedException();
