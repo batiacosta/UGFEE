@@ -2,23 +2,67 @@ using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Util;
 
 public class Paywall : UIScreenBase
 {
     [SerializeField]
     private ToggleValues initialToggleValues;
     [SerializeField] private ToggleValues selectedToggleValues;
+    [SerializeField] private TMP_Text annualPriceText;
+    [SerializeField] private TMP_Text monthlyPriceText;
+    
     private ToggleGroup _toggleGroup;
     private Toggle _activeToggle;
+    private IConfigService _configService;
+    
     private void Awake()
     {
         _toggleGroup = GetComponentInChildren<ToggleGroup>();
     }
 
+    private void Start()
+    {
+        // Get config service and load prices
+        _configService = ServiceLocator.Get<IConfigService>();
+        LoadPricesFromConfig();
+    }
+
     private void OnEnable()
     {
         _toggleGroup.GetComponentInChildren<Toggle>(true).isOn = true;
+        LoadPricesFromConfig();
+    }
+
+    private void LoadPricesFromConfig()
+    {
+        if (_configService == null)
+        {
+            Debug.LogWarning("Paywall: ConfigService not available, using default prices");
+            return;
+        }
+
+        // Get user's cohort to determine which prices to show
+        string userCohort = CohortManager.GetUserCohort();
+        
+        // Load prices based on cohort
+        float priceA = _configService.GetValue<float>($"{userCohort}.priceOptionA", 99.99f);
+        float priceB = _configService.GetValue<float>($"{userCohort}.priceOptionB", 12.99f);
+        
+        // Update UI text elements with prices
+        if (annualPriceText != null)
+        {
+            annualPriceText.text = $"${priceA:F2}";
+        }
+        
+        if (monthlyPriceText != null)
+        {
+            monthlyPriceText.text = $"${priceB:F2}";
+        }
+        
+        Debug.Log($"Paywall: Loaded prices for {userCohort} - Annual: ${priceA:F2}, Monthly: ${priceB:F2}");
     }
 
     public void OnToggleClicked()

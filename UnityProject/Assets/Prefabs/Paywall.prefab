@@ -281,7 +281,7 @@ GameObject:
   - component: {fileID: 4413775543352069036}
   - component: {fileID: 4008453286353358789}
   m_Layer: 5
-  m_Name: FeatureText (1)
+  m_Name: AnnualPriceText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1106,7 +1106,6 @@ GameObject:
   - component: {fileID: 546122115994931993}
   - component: {fileID: 6629587257805909529}
   - component: {fileID: 4787714269021218702}
-  - component: {fileID: 4031547908729701751}
   - component: {fileID: 5472879173206406203}
   - component: {fileID: 3003957171633843549}
   m_Layer: 5
@@ -1176,19 +1175,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4031547908729701751
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5682033742483806357}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 340624ff8508c4c02a6f0b7d2a29bdb8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _nextUI: {fileID: 6514025635680659373, guid: f2197ba85e7c344d7a5026156b8446ed, type: 3}
 --- !u!114 &5472879173206406203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1217,6 +1203,8 @@ MonoBehaviour:
       serializedVersion: 2
       rgba: 4291224050
     titleBold: 1
+  annualPriceText: {fileID: 4008453286353358789}
+  monthlyPriceText: {fileID: 1813981792950119238}
 --- !u!114 &3003957171633843549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1668,7 +1656,7 @@ GameObject:
   - component: {fileID: 1818957800886776018}
   - component: {fileID: 1813981792950119238}
   m_Layer: 5
-  m_Name: FeatureText (1)
+  m_Name: MonthlyPriceText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

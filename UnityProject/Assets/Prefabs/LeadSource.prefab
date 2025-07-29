@@ -1764,6 +1764,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc71ae8d9a6ba4b28a51e5a62624a256, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _freeTrialUI: {fileID: 8884593395912443398, guid: 0dcd89b094d7c4fda9d19da640978fd2, type: 3}
+  _paywallUI: {fileID: 5682033742483806357, guid: 11d4115dd73054a889a6b00c3b2f78a9, type: 3}
 --- !u!1 &6744431999025748272
 GameObject:
   m_ObjectHideFlags: 0
