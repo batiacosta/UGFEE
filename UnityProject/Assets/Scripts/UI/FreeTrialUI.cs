@@ -1,16 +1,19 @@
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class FreeTrialUI : MonoBehaviour
+public class FreeTrialUI : UIScreenBase
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    private ToggleGroup _toggleGroup;
+
+    private void Start()
     {
-        
+        throw new NotImplementedException();
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void Next()
     {
-        
+        throw new System.NotImplementedException();
     }
 }
