@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
+using System.Collections.Generic;
 
 public class LeadSourceScreen : UIScreenBase
 {
@@ -10,23 +11,50 @@ public class LeadSourceScreen : UIScreenBase
     [SerializeField] private GameObject _paywallUI;
     private ToggleGroup _toggleGroup;
     private Toggle _activeToggle;
+    private IAnalyticsService _analyticsService;
 
     private void Awake()
     {
         _toggleGroup = GetComponentInChildren<ToggleGroup>();
     }
 
+    private void Start()
+    {
+        _analyticsService = ServiceLocator.Get<IAnalyticsService>();
+        
+        // Track screen view
+        _analyticsService?.Screen(this, new Dictionary<string, object>
+        {
+            ["entry_timestamp"] = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        });
+    }
+
     public override void Next()
     {
+        string selectedLeadSource = _activeToggle != null ? 
+            _activeToggle.GetComponentInChildren<TMP_Text>().text : "None";
+        
+        _analyticsService?.Track("lead_source_next_clicked", new Dictionary<string, object>
+        {
+            ["selected_lead_source"] = selectedLeadSource,
+            ["click_timestamp"] = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        });
+
         // Based on user's cohort, load the appropriate UI
         string userCohort = CohortManager.GetUserCohort();
         
         if (userCohort == "VariantA")
         {
-            // VariantA gets Free Trial UI
             if (_freeTrialUI != null)
             {
                 Instantiate(_freeTrialUI, transform.parent);
+                
+                _analyticsService?.Track("ui_transition", new Dictionary<string, object>
+                {
+                    ["from_screen"] = "LeadSourceScreen",
+                    ["to_screen"] = "StartFreeTrial",
+                    ["cohort"] = userCohort
+                });
             }
             else
             {
@@ -39,6 +67,14 @@ public class LeadSourceScreen : UIScreenBase
             if (_paywallUI != null)
             {
                 Instantiate(_paywallUI, transform.parent);
+                
+                // Track UI transition
+                _analyticsService?.Track("ui_transition", new Dictionary<string, object>
+                {
+                    ["from_screen"] = "LeadSourceScreen",
+                    ["to_screen"] = "Paywall",
+                    ["cohort"] = userCohort
+                });
             }
             else
             {
@@ -48,8 +84,6 @@ public class LeadSourceScreen : UIScreenBase
         
         // Hide this screen
         Destroy(gameObject);
-        
-        //TODO: Gather Analytics
     }
 
     public void OnToggleClicked()
@@ -61,6 +95,13 @@ public class LeadSourceScreen : UIScreenBase
         if (!_activeToggle) return;
         
         var toggleText = _activeToggle.GetComponentInChildren<TMP_Text>().text;
-        Debug.Log($"Lead Source is: {toggleText}");
+        // Debug.Log($"Lead Source is: {toggleText}");
+        
+        // Track lead source selection
+        _analyticsService?.Track("lead_source_selected", new Dictionary<string, object>
+        {
+            ["selected_source"] = toggleText,
+            ["selection_timestamp"] = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        });
     }
 }

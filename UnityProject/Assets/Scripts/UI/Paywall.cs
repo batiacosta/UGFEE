@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Util;
+using System.Collections.Generic;
 
 public class Paywall : UIScreenBase
 {
@@ -17,6 +18,7 @@ public class Paywall : UIScreenBase
     private ToggleGroup _toggleGroup;
     private Toggle _activeToggle;
     private IConfigService _configService;
+    private IAnalyticsService _analyticsService;
     
     private void Awake()
     {
@@ -25,8 +27,17 @@ public class Paywall : UIScreenBase
 
     private void Start()
     {
-        // Get config service and load prices
+        // Get services
         _configService = ServiceLocator.Get<IConfigService>();
+        _analyticsService = ServiceLocator.Get<IAnalyticsService>();
+        
+        // Track screen view
+        _analyticsService?.Screen(this, new Dictionary<string, object>
+        {
+            ["entry_timestamp"] = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            ["cohort"] = CohortManager.GetUserCohort()
+        });
+        
         LoadPricesFromConfig();
     }
 
@@ -54,13 +65,21 @@ public class Paywall : UIScreenBase
         // Update UI text elements with prices
         if (annualPriceText != null)
         {
-            annualPriceText.text = $"${priceA:F2}";
+            annualPriceText.text = $"${priceA:F2}/year";
         }
         
         if (monthlyPriceText != null)
         {
-            monthlyPriceText.text = $"${priceB:F2}";
+            monthlyPriceText.text = $"${priceB:F2}/month";
         }
+        
+        // Track price display
+        _analyticsService?.Track("prices_displayed", new Dictionary<string, object>
+        {
+            ["annual_price"] = priceA,
+            ["monthly_price"] = priceB,
+            ["cohort"] = userCohort
+        });
         
         Debug.Log($"Paywall: Loaded prices for {userCohort} - Annual: ${priceA:F2}, Monthly: ${priceB:F2}");
     }
@@ -110,7 +129,15 @@ public class Paywall : UIScreenBase
         if (!_activeToggle) return;
         
         var toggleText = _activeToggle.GetComponentInChildren<TMP_Text>().text;
-        Debug.Log($"Lead Source is: {toggleText}");
+        Debug.Log($"Subscription option selected: {toggleText}");
+        
+        // Track subscription option selection
+        _analyticsService?.Track("subscription_option_selected", new Dictionary<string, object>
+        {
+            ["selected_option"] = toggleText,
+            ["selection_timestamp"] = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            ["cohort"] = CohortManager.GetUserCohort()
+        });
     }
     
     [Serializable]
@@ -123,7 +150,16 @@ public class Paywall : UIScreenBase
 
     public override void Next()
     {
-        // Here send data
-        Debug.Log($"Data sending to be implemented {_activeToggle.GetComponentInChildren<TMP_Text>().text}");
+        string selectedOption = _activeToggle?.GetComponentInChildren<TMP_Text>().text ?? "None";
+        
+        _analyticsService?.Track("subscription_purchase_attempted", new Dictionary<string, object>
+        {
+            ["selected_option"] = selectedOption,
+            ["attempt_timestamp"] = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            ["cohort"] = CohortManager.GetUserCohort()
+        });
+        _analyticsService?.Flush();
+        
+        Debug.Log($"Subscription purchase attempted: {selectedOption}");
     }
 }

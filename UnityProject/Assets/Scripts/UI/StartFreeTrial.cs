@@ -1,33 +1,40 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using Util;
+using System.Collections.Generic;
 
 public class StartFreeTrial : UIScreenBase
 {
     [SerializeField] private GameObject _nextUI;
     private ToggleGroup _toggleGroup;
+    private IAnalyticsService _analyticsService;
     
     private void Start()
     {
+        _analyticsService = ServiceLocator.Get<IAnalyticsService>();
+        
+        _analyticsService?.Screen(this, new Dictionary<string, object>
+        {
+            ["entry_timestamp"] = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            ["cohort"] = CohortManager.GetUserCohort()
+        });
+        
         Debug.Log("StartFreeTrial: Free trial screen initialized for VariantA user");
-        // Any initialization logic for free trial can go here
     }
 
     public override void Next()
     {
-        // Handle free trial flow
-        Debug.Log("StartFreeTrial: Starting free trial for user");
-        
-        // TODO: Implement free trial logic
-        // This could include:
-        // - Registering the user for free trial
-        // - Setting up trial period
-        // - Analytics tracking
-        // - Navigation to next screen
+        _analyticsService?.Track("free_trial_started", new Dictionary<string, object>
+        {
+            ["start_timestamp"] = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            ["cohort"] = CohortManager.GetUserCohort()
+        });
+        _analyticsService?.Flush();
         
         if (_nextUI != null)
         {
-            _nextUI.SetActive(true);
+            _nextUI?.SetActive(true);
             gameObject.SetActive(false);
         }
     }
